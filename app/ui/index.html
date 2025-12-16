@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Offline ASR UI</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; max-width: 980px; }
+    label { display: block; font-size: 12px; color: #333; margin-bottom: 6px; }
+    select, input, button, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+    button { cursor: pointer; font-weight: 600; }
+    .col { flex: 1; min-width: 220px; }
+    pre { background: #f7f7f7; border: 1px solid #eee; border-radius: 10px; padding: 12px; overflow: auto; }
+    .muted { color: #666; font-size: 12px; }
+    .status { font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Offline ASR</h2>
+    <div class="muted">Загрузка аудио → транскрибация → вывод текста и сырого JSON.</div>
+
+    <div class="row" style="margin-top: 16px;">
+      <div class="col">
+        <label for="engine">Engine</label>
+        <select id="engine">
+          <option value="whisper">whisper</option>
+          <option value="gigaam">gigaam</option>
+        </select>
+      </div>
+
+      <div class="col">
+        <label for="model">Model</label>
+        <input id="model" placeholder="например: base / medium / v3_e2e_rnnt" />
+      </div>
+
+      <div class="col">
+        <label for="device">Device</label>
+        <select id="device">
+          <option value="auto">auto</option>
+          <option value="cpu">cpu</option>
+          <option value="cuda">cuda</option>
+        </select>
+      </div>
+
+      <div class="col">
+        <label for="language">Language (optional)</label>
+        <input id="language" placeholder="например: en, ru, zh" />
+      </div>
+    </div>
+
+    <div class="row" style="margin-top: 12px;">
+      <div class="col">
+        <label for="file">Audio file</label>
+        <input id="file" type="file" accept="audio/*,.wav,.mp3,.m4a,.flac,.ogg,.opus" />
+        <div class="muted" style="margin-top: 6px;">Файл остаётся локально; отправляется только на ваш локальный сервис.</div>
+      </div>
+
+      <div class="col" style="display:flex; align-items:flex-end;">
+        <button id="btn">Transcribe</button>
+      </div>
+    </div>
+
+    <div class="status" id="status" style="margin-top: 12px;"></div>
+
+    <h3 style="margin-top: 18px;">Text</h3>
+    <textarea id="text" rows="6" readonly placeholder="Результат транскрибации появится здесь..."></textarea>
+
+    <h3 style="margin-top: 18px;">Raw JSON</h3>
+    <pre id="raw">{}</pre>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    async function loadDefaults() {
+      try {
+        const r = await fetch('/engines');
+        const j = await r.json();
+        const engine = $('engine').value;
+        const def = j?.defaults?.[engine];
+        if (!$('model').value && def) $('model').value = def;
+      } catch (_) {}
+    }
+
+    $('engine').addEventListener('change', loadDefaults);
+
+    $('btn').addEventListener('click', async () => {
+      $('status').textContent = '';
+      $('text').value = '';
+      $('raw').textContent = '{}';
+
+      const f = $('file').files?.[0];
+      if (!f) {
+        $('status').textContent = 'Ошибка: выберите аудиофайл.';
+        return;
+      }
+
+      const fd = new FormData();
+      fd.append('engine', $('engine').value);
+      fd.append('model', $('model').value || '');
+      fd.append('device', $('device').value);
+      const lang = $('language').value.trim();
+      if (lang) fd.append('language', lang);
+      fd.append('file', f);
+
+      $('btn').disabled = true;
+      $('status').textContent = 'Выполняется...';
+
+      try {
+        const r = await fetch('/transcribe', { method: 'POST', body: fd });
+        const j = await r.json();
+
+        if (!r.ok) {
+          $('status').textContent = `Ошибка ${r.status}: ${j?.detail ?? 'unknown error'}`;
+          $('raw').textContent = JSON.stringify(j, null, 2);
+          return;
+        }
+
+        const durationStr = typeof j.duration_seconds === 'number'
+          ? `${j.duration_seconds.toFixed(2)}s`
+          : 'n/a';
+        $('status').textContent = `OK — engine=${j.engine}, model=${j.model}, device=${j.device}, language=${j.language ?? 'n/a'}, duration=${durationStr}`;
+        $('text').value = j.text ?? '';
+        $('raw').textContent = JSON.stringify(j, null, 2);
+      } catch (e) {
+        $('status').textContent = `Ошибка сети/сервиса: ${e}`;
+      } finally {
+        $('btn').disabled = false;
+      }
+    });
+
+    loadDefaults();
+  </script>
+</body>
+</html>

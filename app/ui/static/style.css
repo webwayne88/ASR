@@ -1,0 +1,628 @@
+/* === Базовые настройки === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Inter", Arial, sans-serif;
+    background: linear-gradient(180deg, #01121d 0%, #021c28 100%);
+    color: #ffffff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* === Верхняя панель === */
+.navbar {
+    width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 50px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #ffffffcc;
+    line-height: 1.5;
+}
+
+.logo-img {
+    width: 50px;
+    height: 50px;
+    transition: transform 0.3s ease;
+}
+
+.navbar nav a {
+    text-decoration: none;
+    color: #ffffffcc;
+    font-weight: 600;
+    font-size: 18px;
+    margin: 0 60px;
+    transition: color 0.2s ease;
+    cursor: pointer;
+}
+
+.navbar nav a:hover {
+    color: #62ecff;
+}
+
+.navbar nav a.active {
+    color: #5cffbd;
+    font-weight: 600;
+}
+
+/* === Основной контент === */
+#app {
+    min-height: calc(100vh - 80px);
+    padding: 40px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.page {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.page.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Страница записи === */
+.recording-container {
+    background: linear-gradient(180deg, #0095c8 0%, #00d4a9 100%);
+    border-radius: 24px;
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    text-align: center;
+}
+
+.recording-container h1 {
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.recording-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+.record-btn {
+    min-width: 240px;
+    padding: 18px 28px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background: linear-gradient(135deg, #ff4757, #ff6b6b);
+    box-shadow: 0 8px 25px rgba(255, 71, 87, 0.5);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.record-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(255, 71, 87, 0.7);
+}
+
+.record-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.record-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: inset 0 0 0 6px #ff4757;
+    transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.record-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+}
+
+.record-btn.active {
+    background: linear-gradient(135deg, #56ff71, #00ceff);
+    box-shadow: 0 8px 25px rgba(0, 206, 255, 0.5);
+}
+
+.record-btn.active .record-icon {
+    box-shadow: inset 0 0 0 12px #005564;
+    background: #8dffe9;
+}
+
+.timer {
+    font-size: 24px;
+    font-weight: 600;
+    color: white;
+    margin-top: 15px;
+}
+
+.status {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 10px;
+}
+
+.stream-output {
+    margin-top: 30px;
+    text-align: left;
+}
+
+.stream-results {
+    max-height: 280px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 12px;
+}
+
+.stream-row {
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+.stream-row-final {
+    background: rgba(0, 0, 0, 0.5);
+    font-weight: 600;
+}
+
+.stream-row-info {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* === Страница промптов === */
+.prompt-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.prompt-sidebar {
+    background: linear-gradient(180deg, #0095c8 0%, #00d4a9 100%);
+    min-width: 250px;
+    flex: 0 0 250px;
+    border-radius: 20px;
+    padding: 30px 20px;
+    position: relative;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.prompt-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.prompt-new {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.prompt-new input {
+    border-radius: 10px;
+    border: none;
+    padding: 10px 14px;
+}
+
+.prompt-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+    padding: 12px 15px;
+    border-radius: 10px;
+}
+
+.prompt-btn:hover {
+    color: #e0faff;
+    transform: translateX(5px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.prompt-btn.active {
+    background: rgba(0, 0, 0, 0.15);
+    color: #021c28;
+}
+
+.prompt-empty {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    padding: 12px;
+    text-align: center;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.save-btn {
+    display: block;
+    background: linear-gradient(90deg, #56ff71, #00ceff);
+    border: none;
+    color: #000;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 12px 25px;
+    margin: 20px auto 0;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.25s ease;
+    width: 80%;
+}
+
+.save-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.5);
+}
+
+.note {
+    font-size: 12px;
+    margin-top: auto;
+    color: #f8ffff;
+    opacity: 0.8;
+    text-align: center;
+    padding-top: 20px;
+}
+
+.main-content {
+    background: white;
+    color: #000;
+    border-radius: 24px;
+    padding: 30px;
+    flex: 1;
+    min-width: 300px;
+    min-height: 500px;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #000;
+}
+
+#promptInput {
+    width: 100%;
+    flex: 1;
+    resize: none;
+    border: none;
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #000;
+    outline: none;
+    padding: 15px;
+    border-radius: 12px;
+    background: #f8f9fa;
+    overflow-y: auto;
+    min-height: 400px;
+}
+
+/* === Страница загрузки === */
+.upload-container {
+    background: white;
+    color: #000;
+    border-radius: 24px;
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.upload-container h1 {
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: #000;
+}
+
+.upload-area {
+    border: 3px dashed #0095c8;
+    border-radius: 20px;
+    padding: 60px 20px;
+    margin: 30px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: #00d4a9;
+    background: rgba(0, 149, 200, 0.05);
+}
+
+.upload-area.dragover {
+    border-color: #56ff71;
+    background: rgba(86, 255, 113, 0.08);
+}
+
+.upload-area svg {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 20px;
+    fill: #0095c8;
+}
+
+.upload-text {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.browse-btn {
+    background: linear-gradient(135deg, #0095c8, #00d4a9);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.browse-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Скрываем input file */
+#fileInput {
+    display: none;
+}
+
+.file-pill {
+    background: rgba(0, 149, 200, 0.15);
+    padding: 10px 18px;
+    border-radius: 999px;
+    color: #003e52;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.upload-results {
+    margin-top: 20px;
+    color: #003e52;
+    line-height: 1.5;
+}
+
+
+/* === Страница настроек === */
+.settings-container {
+    background: white;
+    color: #000;
+    border-radius: 24px;
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.settings-container h1 {
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: #000;
+}
+
+.setting-item {
+    margin-bottom: 25px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #eee;
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.setting-item h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.setting-item p {
+    color: #666;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.setting-item select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #ced4da;
+    font-size: 16px;
+    background: #f8f9fa;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #0095c8;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* === Система уведомлений === */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #00d4a9, #0095c8);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    font-weight: 600;
+    font-size: 16px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification.success {
+    background: linear-gradient(135deg, #56ff71, #00ceff);
+}
+
+.notification.error {
+    background: linear-gradient(135deg, #ff6b6b, #ff4757);
+}
+
+.notification-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* === Адаптивность === */
+@media (max-width: 1200px) {
+    .container {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    }
+
+    .sidebar {
+    min-width: 100%;
+    max-width: 600px;
+    flex: none;
+    }
+
+    .main-content {
+    min-width: 100%;
+    max-width: 800px;
+    width: 100%;
+    }
+
+    .navbar {
+    padding: 0 20px;
+    }
+
+    .navbar nav a {
+    margin: 0 12px;
+    font-size: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+    flex-direction: column;
+    height: auto;
+    padding: 15px 20px;
+    gap: 15px;
+    }
+
+    .logo {
+    font-size: 18px;
+    }
+
+    .logo-img {
+    width: 40px;
+    height: 40px;
+    }
+
+    .navbar nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    }
+
+    .navbar nav a {
+    margin: 0;
+    font-size: 14px;
+    }
+
+    #app {
+    padding: 20px 15px;
+    }
+}

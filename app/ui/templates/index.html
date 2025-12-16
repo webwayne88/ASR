@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Редактор промпта</title>
+        <link rel="stylesheet" href="/static/style.css" />
+    </head>
+    <body>
+        <!-- Верхняя панель -->
+        <header class="navbar">
+            <div class="logo">
+                <img src="/static/logo.png" alt="radio" class="logo-img" />
+                <p>
+                    Сервис
+                    <br />
+                    Магнитофон
+                </p>
+            </div>
+            <nav id="mainNav">
+                <a class="active" data-page="stream">Поток</a>
+                <a data-page="upload">Файл</a>
+                <a data-page="prompt">Промпт</a>
+                <a data-page="settings">Настройки</a>
+            </nav>
+        </header>
+
+        <main id="app">
+            <div class="page active" id="streamPage">
+                <div class="recording-container">
+                    <h1>Потоковая запись</h1>
+                    <div class="recording-controls">
+                        <button class="record-btn" id="streamToggleBtn" type="button">
+                            <span class="record-icon" aria-hidden="true"></span>
+                            <span class="record-label" id="streamToggleLabel">Начать запись</span>
+                        </button>
+                        <div class="status" id="streamStatus">Остановлено</div>
+                    </div>
+                    <div class="stream-output">
+                        <h3>Результаты</h3>
+                        <div id="streamResults" class="stream-results"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="uploadPage">
+                <div class="upload-container">
+                    <h1>Загрузка файлов</h1>
+                    <div class="upload-area" id="uploadArea">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" x2="12" y1="3" y2="15"></line>
+                        </svg>
+                        <div class="upload-text">Перетащите WAV/MP3/OGG сюда или</div>
+                        <button class="browse-btn" id="browseBtn">Выбрать файл</button>
+                        <input
+                            type="file"
+                            id="fileInput"
+                            accept=".wav,.mp3,.ogg,audio/wav,audio/mpeg,audio/ogg"
+                            style="display: none;"
+                        />
+                    </div>
+                    <div id="fileList"></div>
+                    <button class="save-btn" id="uploadSubmit">Отправить</button>
+                    <div id="uploadResults" class="upload-results"></div>
+                    <p class="note">Рекомендуемая частота дискретизации — 16 кГц.</p>
+                </div>
+            </div>
+            <div class="page" id="promptPage">
+                <div class="prompt-container">
+                    <aside class="prompt-sidebar">
+                        <h3>Доступные промпты</h3>
+                        <div class="prompt-options" id="promptList"></div>
+                        <div class="prompt-new">
+                            <input type="text" id="newPromptKey" placeholder="Название нового промпта" />
+                            <button class="save-btn" id="addPromptBtn">Добавить</button>
+                        </div>
+                        <button class="save-btn" id="saveBtn">Сохранить</button>
+                        <p class="note">*Памятка: Не забудьте сохранить написанный промпт</p>
+                    </aside>
+                    <section class="main-content">
+                        <h1>Системный промпт</h1>
+                        <textarea id="promptInput" placeholder="Введите системный промпт..."></textarea>
+                    </section>
+                </div>
+            </div>
+            <div id="settingsPage" class="page">
+                <div class="settings-container">
+                    <h1>Настройки</h1>
+
+                    <div class="setting-item">
+                        <h3>Модель GigaAM</h3>
+                        <p>Список поддерживаемых локальных моделей</p>
+                        <select id="modelSelect"></select>
+                    </div>
+
+                    <div class="setting-item">
+                        <h3>Устройство обработки</h3>
+                        <p>Выберите CPU или GPU (если доступен)</p>
+                        <select id="deviceSelect"></select>
+                    </div>
+
+                    <div class="setting-item">
+                        <h3>Использовать GPU</h3>
+                        <p>
+                            Переключение на GPU (повышение качества и скорости обработки)
+                        </p>
+                        <label class="toggle-switch">
+                            <input id="processorToggle" type="checkbox" />
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <button class="save-btn" id="saveRuntimeSettings">Сохранить настройки</button>
+                        <p id="runtimeStatus" class="note"></p>
+                    </div>
+
+                    <div class="setting-item">
+                        <h3>Размер чанка для потока (мс)</h3>
+                        <p>Уменьшите значение, чтобы получать промежуточные результаты быстрее.</p>
+                        <input id="chunkInput" type="number" min="250" max="5000" step="50" value="2000" />
+                    </div>
+
+                    <div class="setting-item">
+                        <h3>Каталоги загрузок и результатов</h3>
+                        <div id="pathsStatus" class="paths-status"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="notification" class="notification">
+            <svg class="notification-icon" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 12L11 14L15 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="white" stroke-width="2"></path>
+            </svg>
+            <span id="notificationText">Настройки успешно сохранены!</span>
+        </div>
+
+        <script src="/static/script.js"></script>
+    </body>
+</html>
